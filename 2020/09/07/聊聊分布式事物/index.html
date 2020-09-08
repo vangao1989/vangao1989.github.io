@@ -20,18 +20,19 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":false,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="什么是分布式事物单机事物事务，是包含一系列操作的、一个有边界的工作序列，有明确的开始和结束标志，且要么被完全执行，要么完全失败，即 all or nothing 单体应用，写一个DB，数据一致性由本地事物来保证 分布式事物分布式事务，就是在分布式系统中运行的事务，由多个本地事务组合而成 微服务架构下，不同的服务使用不同的数据源，整个业务层面的全局数据一致性要如何保障呢？     几个相关理论在开始">
+  <meta name="description" content="什么是分布式事物单机事物首先，说几个概念。事务，是包含一系列操作的、一个有边界的工作序列，有明确的开始和结束标志，且要么被完全执行，要么完全失败，即 all or nothing。如下图，就是一个典型的单体应用。他只有一个应用，写一个DB，数据一致性由本地事物来保证（比如mysql的ACID）       分布式事物分布式事务，就是在分布式系统中运行的事务，由多个本地事务组合而成。如下图。微服务架">
 <meta property="og:type" content="article">
-<meta property="og:title" content="聊聊分布式事物">
+<meta property="og:title" content="聊聊分布式事物（上）">
 <meta property="og:url" content="http://example.com/2020/09/07/%E8%81%8A%E8%81%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9/index.html">
 <meta property="og:site_name" content="北执的博客">
-<meta property="og:description" content="什么是分布式事物单机事物事务，是包含一系列操作的、一个有边界的工作序列，有明确的开始和结束标志，且要么被完全执行，要么完全失败，即 all or nothing 单体应用，写一个DB，数据一致性由本地事物来保证 分布式事物分布式事务，就是在分布式系统中运行的事务，由多个本地事务组合而成 微服务架构下，不同的服务使用不同的数据源，整个业务层面的全局数据一致性要如何保障呢？     几个相关理论在开始">
+<meta property="og:description" content="什么是分布式事物单机事物首先，说几个概念。事务，是包含一系列操作的、一个有边界的工作序列，有明确的开始和结束标志，且要么被完全执行，要么完全失败，即 all or nothing。如下图，就是一个典型的单体应用。他只有一个应用，写一个DB，数据一致性由本地事物来保证（比如mysql的ACID）       分布式事物分布式事务，就是在分布式系统中运行的事务，由多个本地事务组合而成。如下图。微服务架">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/1-1.png">
 <meta property="og:image" content="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/1-2.png">
 <meta property="og:image" content="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/20200907203230.png">
+<meta property="og:image" content="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/20200908173658.png">
 <meta property="article:published_time" content="2020-09-07T11:56:27.000Z">
-<meta property="article:modified_time" content="2020-09-08T08:35:00.692Z">
+<meta property="article:modified_time" content="2020-09-08T11:45:46.548Z">
 <meta property="article:author" content="北执">
 <meta property="article:tag" content="分布式">
 <meta property="article:tag" content="事物">
@@ -53,7 +54,7 @@
   };
 </script>
 
-  <title>聊聊分布式事物 | 北执的博客</title>
+  <title>聊聊分布式事物（上） | 北执的博客</title>
   
 
 
@@ -195,7 +196,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          聊聊分布式事物
+          聊聊分布式事物（上）
         </h1>
 
         <div class="post-meta">
@@ -212,7 +213,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-08 16:35:00" itemprop="dateModified" datetime="2020-09-08T16:35:00+08:00">2020-09-08</time>
+                <time title="修改时间：2020-09-08 19:45:46" itemprop="dateModified" datetime="2020-09-08T19:45:46+08:00">2020-09-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -225,7 +226,7 @@
             </span>
 
           
-            <span id="/2020/09/07/%E8%81%8A%E8%81%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9/" class="post-meta-item leancloud_visitors" data-flag-title="聊聊分布式事物" title="阅读次数">
+            <span id="/2020/09/07/%E8%81%8A%E8%81%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9/" class="post-meta-item leancloud_visitors" data-flag-title="聊聊分布式事物（上）" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -251,14 +252,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>603</span>
+              <span>2.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -270,24 +271,55 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="什么是分布式事物"><a href="#什么是分布式事物" class="headerlink" title="什么是分布式事物"></a>什么是分布式事物</h1><h2 id="单机事物"><a href="#单机事物" class="headerlink" title="单机事物"></a>单机事物</h2><p>事务，是包含一系列操作的、一个有边界的工作序列，有明确的开始和结束标志，且要么被完全执行，要么完全失败，即 all or nothing</p>
-<p>单体应用，写一个DB，数据一致性由本地事物来保证<br><img src="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/1-1.png" width="50%"></p>
-<h2 id="分布式事物"><a href="#分布式事物" class="headerlink" title="分布式事物"></a>分布式事物</h2><p>分布式事务，就是在分布式系统中运行的事务，由多个本地事务组合而成</p>
-<p>微服务架构下，不同的服务使用不同的数据源，整个业务层面的全局数据一致性要如何保障呢？</p>
+        <h1 id="什么是分布式事物"><a href="#什么是分布式事物" class="headerlink" title="什么是分布式事物"></a>什么是分布式事物</h1><h2 id="单机事物"><a href="#单机事物" class="headerlink" title="单机事物"></a>单机事物</h2><p>首先，说几个概念。<br>事务，是包含一系列操作的、一个有边界的工作序列，有明确的开始和结束标志，且要么被完全执行，要么完全失败，即 all or nothing。<br>如下图，就是一个典型的单体应用。他只有一个应用，写一个DB，数据一致性由本地事物来保证（比如mysql的ACID）  </p>
+<img src="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/1-1.png" width="50%">
+
+
+
+<h2 id="分布式事物"><a href="#分布式事物" class="headerlink" title="分布式事物"></a>分布式事物</h2><p>分布式事务，就是在分布式系统中运行的事务，由多个本地事务组合而成。<br>如下图。微服务架构下，不同的服务使用不同的数据源，整个业务层面的全局数据一致性要如何保障呢？这个就是分布式事务要解决的问题。</p>
 <img src="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/1-2.png" width="50%">
 
 
 
-<h2 id="几个相关理论"><a href="#几个相关理论" class="headerlink" title="几个相关理论"></a>几个相关理论</h2><p>在开始介绍具体的分布式事物实现方式之前，有必要先看几个分布式领域很有名的理论，可以帮助我们更好的理解后面的内容</p>
-<h3 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h3><blockquote>
-<p> C (一致性)：不管读哪个节点，都能读到最新的值<br> A (可用性)：在合理的时间内返回合理的响应<br> P (分区容错性)：当出现网络分区后，系统能够继续工作  </p>
-</blockquote>
+<h1 id="几个相关理论"><a href="#几个相关理论" class="headerlink" title="几个相关理论"></a>几个相关理论</h1><p>在开始介绍具体的分布式事物实现方式之前，有必要先看几个分布式领域很有名的理论。磨刀不误砍柴工，可以帮助我们更好的理解后面的内容。</p>
+<h2 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h2><ul>
+<li>C (一致性)：不管读哪个节点，都能读到最新的值  </li>
+<li>A (可用性)：在合理的时间内返回合理的响应</li>
+<li>P (分区容错性)：当出现网络分区后，系统能够继续工作  </li>
+</ul>
+<img src="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/20200907203230.png" width="40%">
+
 <p>CAP理论说的是，在一个分布式系统中（指互相连接并共享数据的节点集合）中，当涉及到读写操作时，只能保证一致性（Consistence）、可用性(Availability）、分区容错性（Partition Tolerance）三者中的两个，另外一个必须被牺牲。<br>这个理论告诉我们，不要试图去建立一个完全满足一致性、可用性、分区容错性的系统，这个跟永动机一样，在理论上就是不被允许的。  </p>
-<p>在分布式系统中，分区是常态。比如你双机房部署，a机房和b机房因为网络原因互相不可打，那我们就说系统发生了分区。<br>所以基本上分布式系统，都在一致性和可用性之间做取舍。后面我们介绍的集中分布式事物，也是这样的</p>
-<img src="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/20200907203230.png" width="50%">
+<p>在分布式系统中，分区是常态。比如你双机房部署，a机房和b机房因为网络原因互相不可达，那我们就说系统发生了分区。所以基本上分布式系统，都在一致性和可用性之间做取舍。后面我们介绍的集中分布式事物，也是这样的。</p>
+<p>举几个例子，上图中的zk和eureka，分别是dubbo和spring cloud的服务注册中心，我们就从CAP的角度，分析下这两者的区别。</p>
+<p>zk，是CP的系统。<br>任意时刻，不论访问zk的哪个节点，都能返回一致的结果（强一致性）。所有事物操作会被提交到leader节点，leader完成两段式提交，就是先预提交到follower，半数follower确认后，commit广播到所有follower节点。 zk会出现这样一种情况，当leader节点因为网络故障与其他节点失去联系时(分区发生)，剩余节点会重新进行leader选举。问题在于，选举leader的时间太长，30 ~ 120s, 且选举期间整个zk集群都是不可用的，这就导致在选举期间注册服务瘫痪（不是高可用）。所以我们说，zk是CP的。</p>
+<p>Eureka，是AP的系统。<br>Eureka各个节点都是平等的，几个节点挂掉不会影响正常节点的工作，剩余的节点依然可以提供注册和查询服务。而Eureka的客户端在向某个Eureka注册或时如果发现连接失败，则会自动切换至其它节点，只要有一台Eureka还在，就能保证注册服务可用(保证可用性)，只不过查到的信息可能不是最新的(不保证强一致性)。所以我们说，Eureka是AP的系统。</p>
+<p>再拓展一下，那CP和AP谁更适合做注册中心呢？当向注册中心查询服务列表时，我们可以接受返回的服务列表不一致（最坏的情况就是负载不均衡，以及请求失败需要重试），但不能接受注册中心直接down掉不可用。也就是说，服务注册功能对可用性的要求要高于一致性。所以AP的Eureka更适合</p>
+<h2 id="一致性"><a href="#一致性" class="headerlink" title="一致性"></a>一致性</h2><p>CAP理论说了，大多数的系统，都需要在一致性和可用性之间做取舍，那么，一致性都有哪些等级呢？<br>从强到弱，有下图所示的5个等级。一致性越高，分布式系统的可用性就会越低。大部分的业务系统，基本都是最终一致性的，这个后面会详细展开说。</p>
+<img src="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/20200908173658.png" style="zoom:40%;" />
 
 
 
+<h2 id="ACID"><a href="#ACID" class="headerlink" title="ACID"></a>ACID</h2><p>先说定义，ACID是四个特性的缩写，展开来就是：</p>
+<ul>
+<li>原子性（Atomicity）：事务最终的状态只有两种，全部执行成功和全部不执行</li>
+<li>一致性（Consistency）：事务操作前和操作后，数据的完整性保持一致或满足完整性约束</li>
+<li>隔离性（Isolation）：当系统内有多个事务并发执行时，多个事务不会相互干扰，一个事务内部的操作及使用的数据，对其他并发事务是隔离的</li>
+<li>持久性（Durability）：一个事务完成了，那么它对数据库所做的更新就被永久保存下来了。即使发生系统崩溃或宕机等故障，也能够将其恢复</li>
+</ul>
+<p>MySQL就是ACID的，那么他的ACID是怎么实现的呢？<br>原子性是undo log（回滚日志）；持久性是redo log（重写日志）；隔离性是MVCC和锁。一致性是事务追求的最终目标：前面提到的原子性、持久性和隔离性，都是为了保证数据库状态的一致性。这里具体就不展开说了，后面有机会可以另开一篇。</p>
+<h2 id="BASE"><a href="#BASE" class="headerlink" title="BASE"></a>BASE</h2><p>前面说的ACID，是强一致性的。我们前面说CAP的时候说到了，大多数分布式系统，为了提高系统的吞吐量以及获得高可用性，会牺牲强一致性，保证最终一致性。这个就是BASE理论适用的场景，BASE是对 ACID 原则的弱化</p>
+<p>BASE理论包括了</p>
+<ul>
+<li><p>基本可用（Basically Available）：分布式系统出现故障的时候，允许损失一部分功能的可用性。比如，非核心链路降级处理、限流等</p>
+</li>
+<li><p>柔性状态（Soft State）：允许系统存在中间状态，且这个中间状态不会影响系统整体可用性。比如，MySql读写分离，写库同步到读库（主库同步到从库）会有一个延时</p>
+</li>
+<li><p>最终一致性（Eventual Consistency）：事务在操作过程中可能会由于同步延迟等问题导致不一致，但最终状态下，数据都是一致的</p>
+</li>
+</ul>
+<h1 id="如何实现分布式事务"><a href="#如何实现分布式事务" class="headerlink" title="如何实现分布式事务"></a>如何实现分布式事务</h1><p>说完了基本理论，接下来要说一些具体的实现。包括2PC、3PC，事件消息，TCC、CC，TXC（seata）。</p>
+<p>后续请看聊聊分布式事物（下）</p>
 
     </div>
 
@@ -372,7 +404,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9"><span class="nav-number">1.</span> <span class="nav-text">什么是分布式事物</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E6%9C%BA%E4%BA%8B%E7%89%A9"><span class="nav-number">1.1.</span> <span class="nav-text">单机事物</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9"><span class="nav-number">1.2.</span> <span class="nav-text">分布式事物</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%A0%E4%B8%AA%E7%9B%B8%E5%85%B3%E7%90%86%E8%AE%BA"><span class="nav-number">1.3.</span> <span class="nav-text">几个相关理论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CAP"><span class="nav-number">1.3.1.</span> <span class="nav-text">CAP</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9"><span class="nav-number">1.</span> <span class="nav-text">什么是分布式事物</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E6%9C%BA%E4%BA%8B%E7%89%A9"><span class="nav-number">1.1.</span> <span class="nav-text">单机事物</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9"><span class="nav-number">1.2.</span> <span class="nav-text">分布式事物</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%A0%E4%B8%AA%E7%9B%B8%E5%85%B3%E7%90%86%E8%AE%BA"><span class="nav-number">2.</span> <span class="nav-text">几个相关理论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CAP"><span class="nav-number">2.1.</span> <span class="nav-text">CAP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">2.2.</span> <span class="nav-text">一致性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ACID"><span class="nav-number">2.3.</span> <span class="nav-text">ACID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BASE"><span class="nav-number">2.4.</span> <span class="nav-text">BASE</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1"><span class="nav-number">3.</span> <span class="nav-text">如何实现分布式事务</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -444,13 +476,13 @@
       <i class="fa fa-area-chart"></i>
     </span>
       <span class="post-meta-item-text">站点总字数：</span>
-    <span title="站点总字数">1k</span>
+    <span title="站点总字数">3k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">1 分钟</span>
+    <span title="站点阅读时长">2 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>
