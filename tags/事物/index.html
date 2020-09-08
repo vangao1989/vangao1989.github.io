@@ -20,27 +20,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":false,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="什么是分布式事物单机事物事务，是包含一系列操作的、一个有边界的工作序列，有明确的开始和结束标志，且要么被完全执行，要么完全失败，即 all or nothing 单体应用，写一个DB，数据一致性由本地事物来保证 分布式事物分布式事务，就是在分布式系统中运行的事务，由多个本地事务组合而成 微服务架构下，不同的服务使用不同的数据源，整个业务层面的全局数据一致性要如何保障呢？     几个相关理论在开始">
-<meta property="og:type" content="article">
-<meta property="og:title" content="聊聊分布式事物">
-<meta property="og:url" content="http://example.com/2020/09/07/%E8%81%8A%E8%81%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="北执的博客">
+<meta property="og:url" content="http://example.com/tags/%E4%BA%8B%E7%89%A9/index.html">
 <meta property="og:site_name" content="北执的博客">
-<meta property="og:description" content="什么是分布式事物单机事物事务，是包含一系列操作的、一个有边界的工作序列，有明确的开始和结束标志，且要么被完全执行，要么完全失败，即 all or nothing 单体应用，写一个DB，数据一致性由本地事物来保证 分布式事物分布式事务，就是在分布式系统中运行的事务，由多个本地事务组合而成 微服务架构下，不同的服务使用不同的数据源，整个业务层面的全局数据一致性要如何保障呢？     几个相关理论在开始">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/1-1.png">
-<meta property="og:image" content="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/1-2.png">
-<meta property="og:image" content="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/20200907203230.png">
-<meta property="article:published_time" content="2020-09-07T11:56:27.000Z">
-<meta property="article:modified_time" content="2020-09-08T08:35:00.692Z">
 <meta property="article:author" content="北执">
-<meta property="article:tag" content="分布式">
-<meta property="article:tag" content="事物">
-<meta property="article:tag" content="tcc">
-<meta property="article:tag" content="seata">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/1-1.png">
 
-<link rel="canonical" href="http://example.com/2020/09/07/%E8%81%8A%E8%81%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9/">
+<link rel="canonical" href="http://example.com/tags/%E4%BA%8B%E7%89%A9/">
 
 
 <script id="page-configurations">
@@ -48,12 +36,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : true,
+    isPost : false,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>聊聊分布式事物 | 北执的博客</title>
+  <title>标签: 事物 | 北执的博客</title>
   
 
 
@@ -175,157 +163,57 @@
         <div class="content-wrap">
           
 
-          <div class="content post posts-expand">
+          <div class="content tag">
             
 
-    
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2020/09/07/%E8%81%8A%E8%81%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="北执">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="北执的博客">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          聊聊分布式事物
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-09-07 19:56:27" itemprop="dateCreated datePublished" datetime="2020-09-07T19:56:27+08:00">2020-09-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-08 16:35:00" itemprop="dateModified" datetime="2020-09-08T16:35:00+08:00">2020-09-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2020/09/07/%E8%81%8A%E8%81%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9/" class="post-meta-item leancloud_visitors" data-flag-title="聊聊分布式事物" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
   
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="fa fa-comment-o"></i>
-      </span>
-      <span class="post-meta-item-text">Valine：</span>
-    
-    <a title="valine" href="/2020/09/07/%E8%81%8A%E8%81%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2020/09/07/%E8%81%8A%E8%81%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>603</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+  <div class="post-block">
+    <div class="posts-collapse">
+      <div class="collection-title">
+        <h2 class="collection-header">事物
+          <small>标签</small>
+        </h2>
+      </div>
 
       
-        <h1 id="什么是分布式事物"><a href="#什么是分布式事物" class="headerlink" title="什么是分布式事物"></a>什么是分布式事物</h1><h2 id="单机事物"><a href="#单机事物" class="headerlink" title="单机事物"></a>单机事物</h2><p>事务，是包含一系列操作的、一个有边界的工作序列，有明确的开始和结束标志，且要么被完全执行，要么完全失败，即 all or nothing</p>
-<p>单体应用，写一个DB，数据一致性由本地事物来保证<br><img src="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/1-1.png" width="50%"></p>
-<h2 id="分布式事物"><a href="#分布式事物" class="headerlink" title="分布式事物"></a>分布式事物</h2><p>分布式事务，就是在分布式系统中运行的事务，由多个本地事务组合而成</p>
-<p>微服务架构下，不同的服务使用不同的数据源，整个业务层面的全局数据一致性要如何保障呢？</p>
-<img src="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/1-2.png" width="50%">
-
-
-
-<h2 id="几个相关理论"><a href="#几个相关理论" class="headerlink" title="几个相关理论"></a>几个相关理论</h2><p>在开始介绍具体的分布式事物实现方式之前，有必要先看几个分布式领域很有名的理论，可以帮助我们更好的理解后面的内容</p>
-<h3 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h3><blockquote>
-<p> C (一致性)：不管读哪个节点，都能读到最新的值<br> A (可用性)：在合理的时间内返回合理的响应<br> P (分区容错性)：当出现网络分区后，系统能够继续工作  </p>
-</blockquote>
-<p>CAP理论说的是，在一个分布式系统中（指互相连接并共享数据的节点集合）中，当涉及到读写操作时，只能保证一致性（Consistence）、可用性(Availability）、分区容错性（Partition Tolerance）三者中的两个，另外一个必须被牺牲。<br>这个理论告诉我们，不要试图去建立一个完全满足一致性、可用性、分区容错性的系统，这个跟永动机一样，在理论上就是不被允许的。  </p>
-<p>在分布式系统中，分区是常态。比如你双机房部署，a机房和b机房因为网络原因互相不可打，那我们就说系统发生了分区。<br>所以基本上分布式系统，都在一致性和可用性之间做取舍。后面我们介绍的集中分布式事物，也是这样的</p>
-<img src="https://vangao-blog.oss-cn-hangzhou.aliyuncs.com/20200907203230.png" width="50%">
-
-
-
-
+    <div class="collection-year">
+      <span class="collection-header">2020</span>
     </div>
 
-    
-    
-    
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
-              <a href="/tags/%E4%BA%8B%E7%89%A9/" rel="tag"># 事物</a>
-              <a href="/tags/tcc/" rel="tag"># tcc</a>
-              <a href="/tags/seata/" rel="tag"># seata</a>
-          </div>
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2020-09-07T19:56:27+08:00"
+              content="2020-09-07">
+          09-07
+        </time>
+      </div>
 
-        
+      <div class="post-title">
+          <a class="post-title-link" href="/2020/09/07/%E8%81%8A%E8%81%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9/" itemprop="url">
+            <span itemprop="name">聊聊分布式事物</span>
+          </a>
+      </div>
 
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2020/09/07/hello-world/" rel="prev" title="Hello World">
-      <i class="fa fa-chevron-left"></i> Hello World
-    </a></div>
-      <div class="post-nav-item"></div>
-    </div>
-      </footer>
-    
+    </header>
   </article>
+
+    </div>
+  </div>
   
   
+  
+
   
 
 
 
           </div>
           
-    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -372,7 +260,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9"><span class="nav-number">1.</span> <span class="nav-text">什么是分布式事物</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E6%9C%BA%E4%BA%8B%E7%89%A9"><span class="nav-number">1.1.</span> <span class="nav-text">单机事物</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9"><span class="nav-number">1.2.</span> <span class="nav-text">分布式事物</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%A0%E4%B8%AA%E7%9B%B8%E5%85%B3%E7%90%86%E8%AE%BA"><span class="nav-number">1.3.</span> <span class="nav-text">几个相关理论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CAP"><span class="nav-number">1.3.1.</span> <span class="nav-text">CAP</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
